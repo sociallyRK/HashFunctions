@@ -1,3 +1,15 @@
+"""
+UCLA Extension - Data Structures and Algorithms - Summer 2025  
+Assignment #3 – Hash Tables  
+Author: Rahul Khanna  
+Purpose: Implementation of two Hash Table versions using (1) Chaining and (2) Linear Probing.  
+Includes a custom hash function, collision handling, and resize capability.  
+
+Command Line to Run Program:  
+python3 HashTable_Rahul_Khanna.py
+"""
+
+
 # ---------------------
 # Hash Function
 # ---------------------
@@ -193,6 +205,44 @@ class HashTable:
     def delete(self, key):
         self.strategy.delete(key)
 
+def test_hash_distribution():
+    table_size = 11
+    slots = [0] * table_size
+    keys = [f"key{i}" for i in range(100)]
+
+    for key in keys:
+        index = basic_hash(key, table_size)
+        slots[index] += 1
+
+    print("Hash Distribution (slot -> # of keys):")
+    for i, count in enumerate(slots):
+        print(f"Index {i}: {count} keys")
+import time
+
+
+def benchmark(strategy_class, num_ops=10000):
+    # Use larger table for probing to avoid overflow
+    table_size = 16384 if strategy_class == HashTableLinearProbing else 1024
+    ht = strategy_class(table_size=table_size)
+    keys = [f"key{i}" for i in range(num_ops)]
+
+    start = time.time()
+    for i, key in enumerate(keys):
+        ht.insert(key, str(i))
+    insert_time = time.time() - start
+
+    start = time.time()
+    for key in keys:
+        ht.search(key)
+    search_time = time.time() - start
+
+    print(f"\n{strategy_class.__name__} Performance:")
+    print(f"Insert Time: {insert_time:.4f}s")
+    print(f"Search Time: {search_time:.4f}s")
+
+
+
+
 # ---------------------
 # Demo (Test Code)
 # ---------------------
@@ -254,7 +304,13 @@ def main():
     print("apple hashes to:", basic_hash("apple", 11))  # 2
     print("elppa hashes to:", basic_hash("elppa", 11))  # 9
 
-
+# ---------------------
+# Run Benchmark After Demo
+# ---------------------
+    print("\nBenchmarking Performance on 10,000 keys...")
+    benchmark(HashTableChaining)
+    benchmark(HashTableLinearProbing)
+    print("\n✅ Demo complete. Benchmarking followed. No errors detected.")
 
 
 if __name__ == "__main__":
